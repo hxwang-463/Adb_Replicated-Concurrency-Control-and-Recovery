@@ -1,0 +1,3 @@
+usage:  
+for standard input, run: python3 main.py  
+for file input, run: python3 main.py [file]
