@@ -3,7 +3,7 @@ import re
 import json
 import copy
 
-class Transaction_manager:
+class TransactionManager:
     def __init__(self):
         with open("position.json") as file:
             self.position = json.load(file)
@@ -107,9 +107,6 @@ class Transaction_manager:
                 self.transaction[transaction]["wait_command"] = ["read", variable]
                 if not wait_site_check:
                     print(transaction + " waits available sites on " + variable)
-            # elif self.transaction[transaction]["status"]=="wait_site":
-
-
 
         else:    # RO read
             if self.transaction[transaction]["status"] == "normal":
@@ -197,10 +194,6 @@ class Transaction_manager:
             for variable in self.site[site]["data"]:
                 print(variable+": "+str(self.site[site]["data"][variable]["value"]), end=", ")
             print("")
-
-
-    def querystate(self, arg):
-        pass
 
     def detect_cycle(self):
         reverse_dict = {}
@@ -301,73 +294,66 @@ class Transaction_manager:
 
     def read_command(self, command, time):
         com = re.split("\(|\)", command)
-        if not len(com)==3:
+        if len(com) != 3:
             print("Syntex error on:", command)
             return
         if com[0] == "begin":
             args = com[1].split(",")
-            if not len(args)==1:
+            if len(args) != 1:
                 print("Syntex error on:", command)
                 return
             self.begin(args, time)
         elif com[0] == "beginRO":
             args = com[1].split(",")
-            if not len(args)==1:
+            if len(args) != 1:
                 print("Syntex error on:", command)
                 return
             self.beginro(args, time)
         elif com[0] == "W":
             args = com[1].split(",")
-            if not len(args)==3:
+            if len(args) != 3:
                 print("Syntex error on:", command)
                 return
             self.write(args, time, False)
             self.detect_cycle()
         elif com[0] == "R":
             args = com[1].split(",")
-            if not len(args)==2:
+            if len(args) != 2:
                 print("Syntex error on:", command)
                 return
             self.read(args, time, False)
             self.detect_cycle()
         elif com[0] == "end":
             args = com[1].split(",")
-            if not len(args)==1:
+            if len(args) != 1:
                 print("Syntex error on:", command)
                 return
             self.commit(args, time)
             self.check_wait_site()
         elif com[0] == "fail":
             args = com[1].split(",")
-            if not len(args)==1:
+            if len(args) != 1:
                 print("Syntex error on:", command)
                 return
             self.fail(args, time)
         elif com[0] == "recover":
             args = com[1].split(",")
-            if not len(args)==1:
+            if len(args) != 1:
                 print("Syntex error on:", command)
                 return
             self.recover(args, time)
             self.check_wait_site()
         elif com[0] == "dump":
             args = com[1].split(",")
-            if not len(args)==1:
+            if len(args) != 1:
                 print("Syntex error on:", command)
                 return
             self.dump()
-        elif com[0] == "querystate":
-            args = com[1].split(",")
-            if not len(args)==2:
-                print("Syntex error on:", command)
-                return
-            self.querystate(args)
         else:
             print("Syntex error on:", command)
-            return
 
 if __name__ == '__main__':
-    tm = Transaction_manager()
+    tm = TransactionManager()
     if len(sys.argv)==1:
         print("Read from standard input. Type the instructions here.\nType exit to end program.\n--------------")
         time=1
