@@ -1,10 +1,5 @@
-usage:  
-1. make docker image
-    $ docker image build -t my_adb ./
-2. run container
-2.1 If instructions come from startard input:
-    $ docker run -it --rm my_adb
-2.2 If instructions come from file:
-    make sure the file is in ./test/
-    $ docker run -it --rm my_adb test/[filename]
-
+usage:
+- for standard input, run: 
+$ python3 main.py
+- for file input, run: 
+$ python3 main.py [file]
