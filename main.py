@@ -87,6 +87,17 @@ class TransactionManager:
                             print(transaction + " read " + variable + ": " + str(value))
                             return
                         if not self.site[site]["data"][variable]["write_lock"]:
+                            if self.site[site]["data"][variable]["read_lock"] and transaction not in self.site[site]["data"][variable]["read_lock"]:
+                                for trans in self.transaction:
+                                    if self.transaction[trans]["status"]=="wait_lock":
+                                        for w in self.site[site]["data"][variable]["read_lock"]:
+                                            if w in self.transaction[trans]["wait_lock"]:
+                                                self.transaction[transaction]["status"] = "wait_lock"
+                                                self.transaction[transaction]["wait_lock"] = self.site[site]["data"][variable]["read_lock"]
+                                                self.transaction[transaction]["wait_lock_time"] = time
+                                                self.transaction[transaction]["wait_command"] = ["read", variable]
+                                                print(transaction+" waits read lock on "+variable)
+                                                return
                             if self.site[site]["data"][variable]["can_read"]==1:
                                 if transaction not in self.site[site]["data"][variable]["read_lock"]:
                                     self.site[site]["data"][variable]["read_lock"].append(transaction)
@@ -288,6 +299,10 @@ class TransactionManager:
                 command = self.transaction[transaction]["wait_command"]
                 if command[0]=="read":
                     self.read([transaction, command[1]], self.transaction[transaction]["wait_lock_time"], False)
+                    for trans in self.transaction:
+                        if self.transaction[trans]["status"] == "wait_lock" and transaction in self.transaction[trans]["wait_lock"] and self.transaction[trans]["wait_command"][0]=="read":
+                            self.transaction[trans]["wait_lock"].remove(transaction)
+                            self.check_wait_lock()         
                 elif command[0]=="write":
                     self.write([transaction, command[1], command[2]], self.transaction[transaction]["wait_lock_time"], False)
 
